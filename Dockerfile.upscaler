@@ -61,8 +61,8 @@ RUN cd stable-diffusion-webui && git reset --hard
 #ADD --chown=user https://huggingface.co/ckpt/ControlNet/resolve/main/t2iadapter_canny_sd14v1.pth /content/stable-diffusion-webui/extensions/sd-webui-controlnet/models/t2iadapter_canny_sd14v1.pth
 
 ## Download upscaler model
-# RUN wget https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth --directory-prefix /content/stable-diffusion-webui/models/RealESRGAN/
-# RUN wget https://github.com/cszn/KAIR/releases/download/v1.0/ESRGAN.pth --directory-prefix /content/stable-diffusion-webui/models/ESRGAN/
+RUN wget https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth --directory-prefix /content/stable-diffusion-webui/models/RealESRGAN/
+RUN wget https://github.com/cszn/KAIR/releases/download/v1.0/ESRGAN.pth --directory-prefix /content/stable-diffusion-webui/models/ESRGAN/
 
 
 ## Enable API ##
@@ -75,7 +75,7 @@ RUN sed -i -e 's/    start()/    #start()/g' /content/stable-diffusion-webui/lau
 
 RUN cd stable-diffusion-webui && python launch.py --skip-torch-cuda-test --api
 
-# ADD --chown=user https://huggingface.co/ckpt/sd15/resolve/main/v1-5-pruned-emaonly.ckpt /content/stable-diffusion-webui/models/Stable-diffusion/v1-5-pruned-emaonly.ckpt
+ADD --chown=user https://huggingface.co/ckpt/sd15/resolve/main/v1-5-pruned-emaonly.ckpt /content/stable-diffusion-webui/models/Stable-diffusion/v1-5-pruned-emaonly.ckpt
 
 EXPOSE 7860
 

@@ -1,6 +1,4 @@
-# Dockerfile.Stable --> Dockerfile with upscaler only
-#RealESRGAN_x4plus
-#ESRGAN
+# Dockerfile.Stable --> Dockerfile with SD 1.5 only
 
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.7.1/ubuntu2204/devel/cudnn8/Dockerfile
 # FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu22.04
@@ -60,22 +58,18 @@ RUN cd stable-diffusion-webui && git reset --hard
 #ADD --chown=user https://huggingface.co/ckpt/ControlNet/resolve/main/t2iadapter_color_sd14v1.pth /content/stable-diffusion-webui/extensions/sd-webui-controlnet/models/t2iadapter_color_sd14v1.pth
 #ADD --chown=user https://huggingface.co/ckpt/ControlNet/resolve/main/t2iadapter_canny_sd14v1.pth /content/stable-diffusion-webui/extensions/sd-webui-controlnet/models/t2iadapter_canny_sd14v1.pth
 
-## Download upscaler model
-# RUN wget https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth --directory-prefix /content/stable-diffusion-webui/models/RealESRGAN/
-# RUN wget https://github.com/cszn/KAIR/releases/download/v1.0/ESRGAN.pth --directory-prefix /content/stable-diffusion-webui/models/ESRGAN/
-
-
 ## Enable API ##
 RUN echo "export COMMANDLINE_ARGS=\"--api\"" >> /content/stable-diffusion-webui/webui-user.sh
 RUN chmod +x /content/stable-diffusion-webui/webui-user.sh
 
-RUN sed -i -e '''/    prepare_environment()/a\    os.system\(f\"""sed -i -e ''\"s/dict()))/dict())).cuda()/g\"'' /content/stable-diffusion-webui/repositories/stable-diffusion-stability-ai/ldm/util.py""")''' /content/stable-diffusion-webui/launch.py
+RUN sed -i -e '''/    prepare_environment()/a\    os.system\(f\"""sed -i -e ''\"s/dict()))/dict())).cuda()/g\"'' /content/stable-diffusion-webui/repositories/stable-diffusion-stability-ai/ldm/util.py""")''' /content/stable-diffusion-webui/lau
+nch.py
 RUN sed -i -e 's/fastapi==0.90.1/fastapi==0.89.1/g' /content/stable-diffusion-webui/requirements_versions.txt
 RUN sed -i -e 's/    start()/    #start()/g' /content/stable-diffusion-webui/launch.py
 
 RUN cd stable-diffusion-webui && python launch.py --skip-torch-cuda-test --api
 
-# ADD --chown=user https://huggingface.co/ckpt/sd15/resolve/main/v1-5-pruned-emaonly.ckpt /content/stable-diffusion-webui/models/Stable-diffusion/v1-5-pruned-emaonly.ckpt
+ADD --chown=user https://huggingface.co/ckpt/sd15/resolve/main/v1-5-pruned-emaonly.ckpt /content/stable-diffusion-webui/models/Stable-diffusion/v1-5-pruned-emaonly.ckpt
 
 EXPOSE 7860
 

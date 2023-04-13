@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stable-diffusion-sd15-deployment
+  labels:
+    app: stable-diffusion-sd15
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stable-diffusion-sd15
+  template:
+    metadata:
+      labels:
+        app: stable-diffusion-sd15
+    spec:
+      securityContext:
+          fsGroup: 1000
+          runAsUser: 1000
+          runAsGroup: 1000
+      containers:
+      - name: stable-diffusion-webui
+        #imagePullPolicy: Always
+        image:  us-central1-docker.pkg.dev/winter-inquiry-377308/stable-diffusion/sd-with-api:minimum
+        resources:
+          limits:
+            cpu: 4000m
+            memory: 24Gi
+            nvidia.com/gpu: 1
+        ports:
+          - containerPort: 7860
+        readinessProbe:
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 1
+          httpGet:
+            host:
+            scheme: HTTP
+            path: /
+            port: 7860
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+          - name: sd-nfs
+            mountPath: /content/stable-diffusion-webui/models
+            subPath: models
+          - name: sd-nfs
+            mountPath: /content/stable-diffusion-webui/outputs
+            subPath: outputs
+      volumes:
+        - name: sd-nfs
+          persistentVolumeClaim:
+            claimName: sd-filestore

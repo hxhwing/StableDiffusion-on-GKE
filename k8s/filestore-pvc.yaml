@@ -1,0 +1,11 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sd-filestore
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: filestore-hdd
+  resources:
+    requests:
+      storage: 1Ti

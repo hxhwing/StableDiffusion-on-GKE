@@ -1,0 +1,22 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sd-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: stable-diffusion-sd15-deployment
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: External
+      external:
+        metric:
+          name: kubernetes.io|container|accelerator|duty_cycle
+          selector:
+             matchLabels:
+               resource.labels.container_name: stable-diffusion-webui
+        target:
+          type: AverageValue
+          averageValue: 50
