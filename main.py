@@ -6,7 +6,7 @@ from os import listdir
 from time import perf_counter
 
 
-from sdwebuiapi.webuiapi import webuiapi
+from sdwebuiapi import webuiapi
 
 api = webuiapi.WebUIApi(host="104.154.42.128", port=7860, sampler="Euler a", steps=20)
 folder_dir = "sample_images"
