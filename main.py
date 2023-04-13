@@ -8,8 +8,8 @@ from time import perf_counter
 
 from sdwebuiapi.webuiapi import webuiapi
 
-api = webuiapi.WebUIApi(host="34.171.136.153", port=7860, sampler="Euler a", steps=20)
-folder_dir = "images"
+api = webuiapi.WebUIApi(host="104.154.42.128", port=7860, sampler="Euler a", steps=20)
+folder_dir = "sample_images"
 
 
 def upscale(image_file):
@@ -18,13 +18,14 @@ def upscale(image_file):
         image_b64 = Image.open(folder_dir + "/" + image_file)
     response = api.extra_single_image(
         image=image_b64,
-        upscaler_1=webuiapi.Upscaler.ESRGAN_4x,
+        upscaler_1=webuiapi.Upscaler.R_ESRGAN_4x,
         upscaling_resize=4,
-        upscaler_2=webuiapi.Upscaler.Lanczos,
+        upscaler_2=webuiapi.Upscaler.ESRGAN_4x,
+        extras_upscaler_2_visibility=0.7,
     )
     dst_file = os.path.basename(image_b64.filename)
-    response.image.save("upscale/" + dst_file)
-    print("save to upscale/" + dst_file)
+    response.image.save("outputs/" + dst_file)
+    print("save to outputs/" + dst_file)
 
 
 t1_start = perf_counter()
@@ -39,7 +40,7 @@ with ThreadPoolExecutor(max_workers=threads) as executor:
     futures = {executor.submit(upscale, image) for image in os.listdir(folder_dir)}
     for future in concurrent.futures.as_completed(futures):
         try:
-            print()
+            # print()
             data = future.result()
             # print(data)
         except Exception as e:
