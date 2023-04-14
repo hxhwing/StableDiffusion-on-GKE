@@ -1,6 +1,6 @@
 # StableDiffusion-on-GKE
 
-**介绍如何在 GKE 上快速运行 [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)，以及如何通过 API 调用 txt2img，img2img, upscaler等任务**
+**介绍如何在 GKE 上快速运行 [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui) 和 [InvokeAI](https://github.com/invoke-ai/InvokeAI)，以及如何通过 API 调用 txt2img，img2img, upscaler等任务**
 
 ## Build image
 使用 Cloud Build 构建镜像，注意最少需要 ```e2-highcpu-8/e2-highcpu-8``` 以上机型，否则build过程会出现OOM报错
