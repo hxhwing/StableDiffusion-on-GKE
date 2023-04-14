@@ -6,11 +6,15 @@
 使用 Cloud Build 构建镜像，注意最少需要 ```e2-highcpu-8/e2-highcpu-8``` 以上机型，否则build过程会出现OOM报错
 ```
 git clone https://github.com/hxhwing/StableDiffusion-on-GKE.git
+
 gcloud builds submit --region=us-central1 --tag us-central1-docker.pkg.dev/winter-inquiry-377308/stable-diffusion/sd-with-api:minimum --machine-type=e2-highcpu-8
 ```
 
-## Create GKE cluster and GPU nodes
-创建 GKE 集群 和 GPU node pool，运行 Stable Diffusion 建议至少选择 ```n1-standard-8``` 以上机型; 除了 A100 之外，其他所有显卡都只支持 n1 机型；另外请注意开启 ```image streaming```，可大大缩短拉取镜像的时间。
+## Create GKE cluster and GPU node pool
+创建一个新的 GKE 集群 和 GPU node pool，请注意开启 ```image streaming```，可大大缩短拉取镜像的时间。
+> **Note**
+>
+> 运行 Stable Diffusion 建议至少选择 ```n1-standard-8``` 以上机型; 除了 A100 之外，其他 NVIDIA 显卡，例如 T4，V100 都仅支持 n1 机型
 ```
 gcloud container clusters create "sd-test" \
 --zone "us-central1-c" \
@@ -22,6 +26,17 @@ gcloud container clusters create "sd-test" \
 --enable-image-streaming
 ```
 
+如果当前已有 GKE cluster，则创建一个新的 GPU node pool
+```
+cluster_name='sd-test'
+gcloud container node-pools create "gpu-nodepool" \
+--cluster $cluster_name \
+--zone "us-central1-c" \
+--machine-type "n1-standard-8" \
+--accelerator "type=nvidia-tesla-t4,count=1" \
+--num-nodes "1" \
+--enable-autoscaling --min-nodes "1" --max-nodes "3" --location-policy "BALANCED" 
+```
 
 ## Deploy resources
 ### 获取 kubectl context
@@ -120,4 +135,18 @@ result3 = api.extra_single_image(image=result2.image,
                                 upscaling_resize=2)
 
 ```
+
+
+## Deploy InvokeAI webui
+
+[InvokeAI](https://github.com/invoke-ai/InvokeAI) 是另外一个主流的 Stable Diffusion Web UI，也可以方便的部署在 GKE 上
+```
+kubectl apply -f InvokeAI/sd_invokeai_deployment.yaml
+kubectl apply -f InvokeAI/sd_invokeai_service.yaml
+
+# 如果需要部署多个 replica，建议把 models 和 outputs 放到共享存储 filestore 
+kubectl apply -f InvokeAI/sd_invokeai_deployment_filestore.yaml
+
+```
+![invokeai](/images/invokeai.png)
 

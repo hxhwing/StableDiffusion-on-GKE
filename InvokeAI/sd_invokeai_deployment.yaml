@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stable-diffusion-deployment-invokeai
+  labels:
+    app: stable-diffusion-invokeai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stable-diffusion-invokeai
+  template:
+    metadata:
+      labels:
+        app: stable-diffusion-invokeai
+    spec:
+      containers:
+      - name: stable-diffusion-invokeai
+        # imagePullPolicy: Always
+        image:  invokeai/invokeai:latest
+        resources:
+          limits:
+            cpu: 4000m
+            memory: 24Gi
+            nvidia.com/gpu: 1
+        ports:
+          - containerPort: 9090
+        readinessProbe:
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 1
+          httpGet:
+            host:
+            scheme: HTTP
+            path: /
+            port: 9090
+          initialDelaySeconds: 5
+          periodSeconds: 5
